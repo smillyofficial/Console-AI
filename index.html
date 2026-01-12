@@ -43,9 +43,6 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .nether-glow:hover { box-shadow: 0 0 40px rgba(255, 77, 77, 0.2); border-color: var(--nether-red); transform: translateY(-5px); }
-        .overworld-glow:hover { box-shadow: 0 0 40px rgba(74, 222, 128, 0.2); border-color: var(--overworld-green); transform: translateY(-5px); }
-
         .glitch {
             position: relative;
             color: white;
@@ -103,6 +100,12 @@
             padding: 20px;
         }
 
+        #director-reveal {
+            display: none;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
         @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
     </style>
@@ -116,6 +119,7 @@
         </div>
         <div class="hidden md:flex space-x-10 text-xs font-bold uppercase tracking-[0.2em] items-center">
             <a href="#about" class="hover:text-red-500 transition">The World</a>
+            <a href="#members" class="hover:text-blue-400 transition">The Council</a>
             <a href="#shop" class="hover:text-yellow-400 transition">Black Market</a>
             <a href="#doomsday" class="hover:text-red-600 transition">Doomsday</a>
             <div class="flex items-center gap-2 bg-yellow-400/10 px-3 py-1 rounded border border-yellow-400/20">
@@ -136,7 +140,7 @@
             </h1>
             <p class="text-gray-300 text-lg md:text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
                 Experience raw survival. Like Unstable SMP, but without the safety net. 
-                No scripts. No retakes. Just three factions fighting for dominance.
+                No scripts. No retakes. Just 4 Rulers fighting for the Overworld and the Nether.
             </p>
             <div class="flex flex-col md:flex-row gap-6 justify-center">
                 <a href="#join" class="px-12 py-5 bg-white text-black font-black bungee tracking-widest hover:invert transition-all">
@@ -152,7 +156,7 @@
     <!-- Redeem Section -->
     <section class="py-12 bg-yellow-400 text-black px-6">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="bungee text-2xl">GOT A REDEEM CODE?</div>
+            <div class="bungee text-2xl uppercase">Redeem Codes</div>
             <div class="flex w-full md:w-auto gap-2">
                 <input type="text" id="redeem-input" placeholder="ENTER CODE..." class="px-4 py-3 bg-white/20 border-2 border-black placeholder:text-black/50 font-bold focus:outline-none w-full md:w-64 uppercase">
                 <button onclick="handleRedeem()" class="px-8 py-3 bg-black text-white bungee hover:bg-zinc-800 transition">REDEEM</button>
@@ -160,11 +164,60 @@
         </div>
     </section>
 
+    <!-- Council Section -->
+    <section id="members" class="py-32 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-6xl bungee italic mb-4">THE COUNCIL</h2>
+            <p class="text-gray-500 tracking-[0.3em] font-bold uppercase text-xs">The 4 main rulers of existence</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Pixel -->
+            <div class="card-blur p-8 border-l-4 border-red-600">
+                <div class="text-red-500 bungee text-xs mb-2">ANTAGONIST</div>
+                <h3 class="text-3xl bungee mb-2">PIXEL</h3>
+                <p class="fraktur text-xl text-red-200 opacity-60 mb-4">"King of the Nether"</p>
+                <p class="text-gray-400 text-sm leading-relaxed">The ultimate threat from below. Pixel commands the flames and ensures the Nether remains a nightmare for the unworthy.</p>
+            </div>
+            <!-- Tempest -->
+            <div class="card-blur p-8 border-l-4 border-red-800">
+                <div class="text-red-700 bungee text-xs mb-2">ANTAGONIST</div>
+                <h3 class="text-3xl bungee mb-2">TEMPEST</h3>
+                <p class="fraktur text-xl text-red-200 opacity-60 mb-4">"Doombringer of Hell"</p>
+                <p class="text-gray-400 text-sm leading-relaxed">A force of pure destruction. Tempest brings the chaos of the deep hells to the surface dwellers.</p>
+            </div>
+            <!-- Akram -->
+            <div class="card-blur p-8 border-l-4 border-green-600">
+                <div class="text-green-400 bungee text-xs mb-2">PROTAGONIST</div>
+                <h3 class="text-3xl bungee mb-2">AKRAM</h3>
+                <p class="fraktur text-xl text-green-100 opacity-60 mb-4">"King of the Overworld"</p>
+                <p class="text-gray-400 text-sm leading-relaxed">The righteous defender of the surface. Akram leads the charge against the encroaching darkness.</p>
+            </div>
+            <!-- Mikey -->
+            <div class="card-blur p-8 border-l-4 border-blue-500">
+                <div class="text-blue-400 bungee text-xs mb-2">PROTAGONIST</div>
+                <h3 class="text-3xl bungee mb-2">MIKEY</h3>
+                <p class="fraktur text-xl text-blue-100 opacity-60 mb-4">"Puppeteer of the Overworld"</p>
+                <p class="text-gray-400 text-sm leading-relaxed">The strategist. Mikey controls the flow of resources and information to keep the world from collapsing.</p>
+            </div>
+        </div>
+
+        <!-- Secret Member Section -->
+        <div id="director-reveal" class="mt-12 bg-red-600 p-12 text-center rounded-lg shadow-2xl">
+            <div class="bungee text-white text-xs tracking-widest mb-4">UNLOCKED???!!!</div>
+            <h3 class="text-6xl bungee text-white italic mb-2">SECRET MEMBER</h3>
+            <p class="orbitron text-2xl font-black text-black mb-6 tracking-tighter">DIRECTOR | KING OF THE REALMS</p>
+            <p class="max-w-2xl mx-auto text-red-100 font-bold uppercase text-sm leading-relaxed">
+                The Doomsday owner. He exists between the cracks of reality. When the timer hits zero, he is the one who initiates the end.
+            </p>
+        </div>
+    </section>
+
     <!-- Shop Section -->
     <section id="shop" class="py-32 px-6 max-w-7xl mx-auto">
         <div class="text-center mb-16">
             <h2 class="text-4xl md:text-6xl bungee italic mb-4">THE BLACK MARKET</h2>
-            <p class="text-gray-500 tracking-[0.3em] font-bold uppercase text-xs">Spend your Dino Coins wisely</p>
+            <p class="text-gray-500 tracking-[0.3em] font-bold uppercase text-xs">Full Inventory Restored</p>
         </div>
 
         <!-- Category: Armor -->
@@ -199,51 +252,51 @@
             <h3 class="bungee text-2xl mb-8 border-b border-white/10 pb-4 text-gray-400 italic">The Arsenal</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="card-blur p-6 rounded hover:border-red-500 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Copper Sword</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">25 Dino Coins</p>
-                    <button onclick="buyItem('Copper Sword', 25)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                </div>
-                <div class="card-blur p-6 rounded hover:border-red-500 transition cursor-default">
                     <h4 class="font-bold text-xl mb-1">Iron Sword</h4>
                     <p class="text-yellow-400 bungee text-sm mb-4">45 Dino Coins</p>
                     <button onclick="buyItem('Iron Sword', 45)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
                 <div class="card-blur p-6 rounded hover:border-red-500 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Diamond S&A</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">80 Dino Coins</p>
-                    <button onclick="buyItem('Diamond Sword & Axe', 80)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">Diamond Sword</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">150 Dino Coins</p>
+                    <button onclick="buyItem('Diamond Sword', 150)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
                 <div class="card-blur p-6 rounded border-red-500/50 bg-red-500/5 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Netherite S&A</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">100 Dino Coins</p>
-                    <button onclick="buyItem('Netherite Sword & Axe', 100)" class="w-full py-2 bg-red-500 text-white font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">Netherite Slayer</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">600 Dino Coins</p>
+                    <button onclick="buyItem('Netherite Sword', 600)" class="w-full py-2 bg-red-500 text-white font-bold text-xs transition bungee">PURCHASE</button>
+                </div>
+                <div class="card-blur p-6 rounded hover:border-red-500 transition cursor-default">
+                    <h4 class="font-bold text-xl mb-1">Power Bow</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">80 Dino Coins</p>
+                    <button onclick="buyItem('Power Bow', 80)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
             </div>
         </div>
 
-        <!-- Category: Tools -->
+        <!-- Category: Survival -->
         <div>
-            <h3 class="bungee text-2xl mb-8 border-b border-white/10 pb-4 text-gray-400 italic">Excavation Tools</h3>
+            <h3 class="bungee text-2xl mb-8 border-b border-white/10 pb-4 text-gray-400 italic">Survival Essentials</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="card-blur p-6 rounded hover:border-blue-500 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Copper Pickaxe</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">15 Dino Coins</p>
-                    <button onclick="buyItem('Copper Pickaxe', 15)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">God Apple</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">250 Dino Coins</p>
+                    <button onclick="buyItem('Enchanted Golden Apple', 250)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
                 <div class="card-blur p-6 rounded hover:border-blue-500 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Iron Pickaxe</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">28 Dino Coins</p>
-                    <button onclick="buyItem('Iron Pickaxe', 28)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">Ender Chest</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">120 Dino Coins</p>
+                    <button onclick="buyItem('Ender Chest', 120)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
                 <div class="card-blur p-6 rounded hover:border-blue-500 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Diamond Pickaxe</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">39 Dino Coins</p>
-                    <button onclick="buyItem('Diamond Pickaxe', 39)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">Totem</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">300 Dino Coins</p>
+                    <button onclick="buyItem('Totem of Undying', 300)" class="w-full py-2 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
                 <div class="card-blur p-6 rounded border-blue-500/50 bg-blue-500/5 transition cursor-default">
-                    <h4 class="font-bold text-xl mb-1">Netherite Pickaxe</h4>
-                    <p class="text-yellow-400 bungee text-sm mb-4">60 Dino Coins</p>
-                    <button onclick="buyItem('Netherite Pickaxe', 60)" class="w-full py-2 bg-blue-500 text-white font-bold text-xs transition bungee">PURCHASE</button>
+                    <h4 class="font-bold text-xl mb-1">64x Steak</h4>
+                    <p class="text-yellow-400 bungee text-sm mb-4">20 Dino Coins</p>
+                    <button onclick="buyItem('Steak Stack', 20)" class="w-full py-2 bg-blue-500 text-white font-bold text-xs transition bungee">PURCHASE</button>
                 </div>
             </div>
         </div>
@@ -324,12 +377,12 @@
     <div id="toast" class="toast">COPIED TO CLIPBOARD</div>
 
     <script>
-        // State Management
         let balance = 0;
         const usedCodes = new Set();
         const codes = {
             "NEW!": 20,
-            "OFFICIALWEBSITE": 10
+            "OFFICIALWEBSITE": 10,
+            "123": 0
         };
 
         function updateBalanceDisplay() {
@@ -340,6 +393,14 @@
             const input = document.getElementById('redeem-input');
             const code = input.value.trim().toUpperCase();
             
+            if (code === "123") {
+                document.getElementById('director-reveal').style.display = 'block';
+                document.getElementById('director-reveal').scrollIntoView({ behavior: 'smooth' });
+                showToast("UNLOCKED???!!!");
+                input.value = "";
+                return;
+            }
+
             if (usedCodes.has(code)) {
                 showToast("CODE ALREADY USED!");
             } else if (codes[code]) {
@@ -366,8 +427,6 @@
             if (balance >= cost) {
                 balance -= cost;
                 updateBalanceDisplay();
-                
-                // Show Modal
                 document.getElementById('modal-item-name').innerText = name;
                 document.getElementById('verification-code').innerText = generateVerificationCode();
                 document.getElementById('purchase-modal').style.display = 'flex';
@@ -408,7 +467,6 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        // Close modal on outside click
         window.onclick = function(event) {
             const modal = document.getElementById('purchase-modal');
             if (event.target == modal) {
