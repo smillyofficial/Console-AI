@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Console AI | V6 Pro</title>
+    <style>
+        :root {
+            --bg: #050505;
+            --sidebar: #0e0e10;
+            --accent: #ffffff;
+            --text-main: #e0e0e0;
+            --text-dim: #a1a1aa;
+            --border: rgba(255, 255, 255, 0.08);
+            --bubble: #161618;
+            --gold: #ffcc00;
+            --danger: #ff4444;
+            --primary: #4a90e2;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; position: relative; }
+        /* Animated Background */
+        .stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+        .star { position: absolute; background: #fff; border-radius: 50%; animation: moveStar linear infinite; opacity: 0.8; }
+        @keyframes moveStar { 0% { transform: translateY(0); } 100% { transform: translateY(100vh); } }
+        /* Sidebar */
+        .sidebar { width: 280px; background: linear-gradient(to bottom, var(--sidebar), #0a0a0c); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; z-index: 100; box-shadow: var(--shadow); }
+        .logo-area { display: flex; align-items: center; gap: 12px; font-weight: 700; margin-bottom: 30px; color: var(--accent); }
+        .logo-area img { width: 32px; height: 32px; border-radius: 6px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .balance-card { background: var(--bubble); padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); }
+        .balance-card span { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-card h2 { color: var(--gold); font-size: 1.5rem; margin-top: 5px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+        .nav-btn { display: flex; align-items: center; gap: 12px; padding: 12px; color: var(--text-dim); cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 0.95rem; margin-bottom: 4px; }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.05); color: var(--primary); transform: translateX(4px); }
+        /* Chat History List */
+        .chat-list { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+        .chat-item { padding: 10px; background: var(--bubble); border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .chat-item:hover { background: rgba(255,255,255,0.05); }
+        .chat-item.active { color: var(--primary); }
+        /* Main Viewport */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .viewport { flex: 1; overflow-y: auto; padding: 60px 20px; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
+        .container { width: 100%; max-width: 850px; display: none; }
+        .container.active { display: block; }
+        /* Chat UI */
+        #chat-messages { display: flex; flex-direction: column; gap: 30px; }
+        .msg { display: flex; gap: 20px; animation: fadeIn 0.3s ease; }
+        .msg.user { flex-direction: row-reverse; }
+        .avatar { width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; background: #222; box-shadow: var(--shadow); }
+        .msg-content { max-width: 80%; line-height: 1.6; font-size: 1rem; color: var(--text-main); padding: 12px 18px; border-radius: 18px; box-shadow: var(--shadow); }
+        .ai .msg-content { background: var(--bubble); border: 1px solid var(--border); border-radius: 18px 18px 18px 2px; }
+        .user .msg-content { background: var(--primary); color: #fff; border-radius: 18px 18px 2px 18px; font-weight: 500; }
+        /* Chat Controls */
+        .chat-controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .control-btn { padding: 8px 16px; background: var(--bubble); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; color: var(--text-main); transition: 0.2s; }
+        .control-btn:hover { background: var(--primary); color: #fff; }
+        /* Input System */
+        .input-dock { padding: 30px; display: flex; justify-content: center; background: linear-gradient(transparent, var(--bg) 50%); position: sticky; bottom: 0; }
+        .dock-inner { width: 100%; max-width: 850px; background: var(--bubble); border: 1px solid var(--border); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); transition: box-shadow 0.3s; }
+        .dock-inner:focus-within { box-shadow: 0 0 15px rgba(74, 144, 226, 0.5); }
+        .tool-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .chip { padding: 6px 14px; border-radius: 15px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); cursor: pointer; background: transparent; transition: 0.2s; }
+        .chip:hover { background: rgba(255,255,255,0.05); }
+        .chip.active { border-color: var(--primary); color: var(--primary); background: rgba(74, 144, 226, 0.1); }
+        textarea { width: 100%; background: transparent; border: none; outline: none; color: #fff; resize: none; font-size: 1rem; padding: 5px; min-height: 24px; max-height: 200px; }
+        /* Shop Grid */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        .shop-item { background: linear-gradient(to bottom, var(--bubble), #1a1a1c); border: 1px solid var(--border); padding: 25px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+        .shop-item:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(74, 144, 226, 0.3); }
+        .qty-control { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; }
+        .buy-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; background: var(--primary); color: #fff; }
+        .buy-btn:hover { background: #3a7bc8; }
+        .buy-btn.disabled { background: var(--danger) !important; color: #fff; cursor: not-allowed; }
+        /* Settings */
+        #view-settings { padding: 20px; }
+        .setting-item { margin-bottom: 20px; }
+        .setting-item label { display: block; margin-bottom: 8px; color: var(--text-dim); }
+        .setting-btn { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+        /* Bright Mode */
+        body.bright { --bg: #f0f0f0; --sidebar: #ffffff; --accent: #000000; --text-main: #333333; --text-dim: #666666; --border: rgba(0, 0, 0, 0.1); --bubble: #e0e0e0; --gold: #d4a017; --danger: #ff4444; --primary: #007bff; }
+        body.bright .star { background: #000; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars-bg"></div>
+    <aside class="sidebar">
+        <div class="logo-area"><img src="logo.png"> CONSOLE AI</div>
+        <div class="balance-card">
+            <span>Dino Coins</span>
+            <h2 id="coin-display">0</h2>
+        </div>
+        <div class="nav-btn active" id="btn-chat" onclick="view('chat')">💬 Intelligence</div>
+        <div class="nav-btn" id="btn-shop" onclick="view('shop')">🛒 Marketplace</div>
+        <div class="nav-btn" id="btn-codes" onclick="view('codes')">🎁 Rewards</div>
+        <div class="nav-btn" id="btn-settings" onclick="view('settings')">⚙️ Settings</div>
+        <div style="flex:1"></div>
+        <div class="chat-list" id="chat-list"></div>
+    </aside>
+    <main class="main">
+        <div class="viewport">
+            <div id="view-chat" class="container active">
+                <div class="chat-controls">
+                    <button class="control-btn" onclick="newChat()">New Chat</button>
+                    <button class="control-btn" onclick="deleteChat()">Delete</button>
+                    <button class="control-btn" onclick="saveChat()">Save</button>
+                    <button class="control-btn" onclick="shareChat()">Share</button>
+                </div>
+                <div id="chat-messages"></div>
+            </div>
+            <div id="view-shop" class="container">
+                <h1 style="margin-bottom: 10px;">Marketplace</h1>
+                <p style="color:var(--text-dim); margin-bottom: 30px;">Premium Minecraft gear, perks, and plugins.</p>
+                <div class="shop-grid" id="market-items"></div>
+            </div>
+            <div id="view-codes" class="container">
+                <h1>Redeem Codes</h1>
+                <input type="text" id="code-input" placeholder="Enter code here..." style="width:100%; padding:20px; background:var(--bubble); border:1px solid var(--border); border-radius:12px; color:var(--text-main); margin:20px 0; outline:none;">
+                <button class="buy-btn" onclick="redeem()">Claim Reward</button>
+            </div>
+            <div id="view-settings" class="container">
+                <h1>Settings</h1>
+                <div class="setting-item">
+                    <label>UI Mode</label>
+                    <select id="ui-mode" onchange="changeUIMode(this.value)">
+                        <option value="dark">Dark</option>
+                        <option value="bright">Bright</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Animated Background</label>
+                    <select id="anim-bg" onchange="toggleAnimBg(this.value)">
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <button class="setting-btn" onclick="resetAllData()">Reset All Data</button>
+                </div>
+            </div>
+        </div>
+        <div class="input-dock" id="chat-bar">
+            <div class="dock-inner">
+                <div class="tool-row">
+                    <button class="chip active" id="smart-mode" onclick="toggleChip(this)">Smart Mode</button>
+                    <button class="chip" id="deep-research" onclick="toggleChip(this)">Deep Research</button>
+                    <label class="chip">📎 Attach File<input type="file" hidden onchange="alert('File analyzed.')"></label>
+                </div>
+                <textarea id="user-prompt" rows="1" placeholder="Ask anything..." onkeydown="checkKey(event)"></textarea>
+            </div>
+        </div>
+    </main>
+    <script>
+        let balance = parseInt(localStorage.getItem('coins') || '0');
+        let usedCodes = JSON.parse(localStorage.getItem('used') || '[]');
+        let chats = JSON.parse(localStorage.getItem('chats') || '[]');
+        let currentChatId = localStorage.getItem('currentChatId') || null;
+        let conversationHistory = [];
+        let plugins = JSON.parse(localStorage.getItem('plugins') || '{}');
+        let settings = JSON.parse(localStorage.getItem('settings') || '{"ui":"dark","anim":"on"}');
+        const items = [
+            { id: 'gapple', name: 'Golden Apple', price: 20 },
+            { id: 'darmor', name: 'Diamond Armour', price: 90 },
+            { id: 'nether', name: 'Netherite Ingot', price: 150 },
+            { id: 'smartthink', name: 'Smarter Thinking Plugin', price: 50 }
+        ];
+        let qties = items.reduce((acc, i) => ({...acc, [i.id]: 1}), {});
+
+        // Init Settings
+        document.body.classList.toggle('bright', settings.ui === 'bright');
+        document.getElementById('ui-mode').value = settings.ui;
+        document.getElementById('anim-bg').value = settings.anim;
+        toggleAnimBg(settings.anim);
+
+        // Animated Background
+        function createStars() {
+            const stars = document.getElementById('stars-bg');
+            stars.innerHTML = '';
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = star.style.height = `${Math.random() * 2 + 1}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                stars.appendChild(star);
+            }
+        }
+        if (settings.anim === 'on') createStars();
+
+        function toggleAnimBg(val) {
+            settings.anim = val;
+            localStorage.setItem('settings', JSON.stringify(settings));
+            if (val === 'on') {
+                createStars();
+                document.getElementById('stars-bg').style.display = 'block';
+            } else {
+                document.getElementById('stars-bg').style.display = 'none';
+            }
+        }
+
+        function changeUIMode(val) {
+            settings.ui = val;
+            localStorage.setItem('settings', JSON.stringify(settings));
+            document.body.classList.toggle('bright', val === 'bright');
+        }
+
+        function resetAllData() {
+            if (confirm('Reset all data?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Chat Management
+        if (!currentChatId || !chats.find(c => c.id === currentChatId)) {
+            newChat();
+        } else {
+            loadChat(currentChatId);
+        }
+
+        function newChat() {
+            const id = Date.now().toString();
+            const newC = { id, title: `Chat ${chats.length + 1}`, messages: [] };
+            chats.push(newC);
+            saveChats();
+            loadChat(id);
+            renderMsg('ai', 'Hello Im console AI!');
+        }
+
+        function deleteChat() {
+            if (confirm('Delete this chat?')) {
+                chats = chats.filter(c => c.id !== currentChatId);
+                saveChats();
+                if (chats.length === 0) {
+                    newChat();
+                } else {
+                    loadChat(chats[0].id);
+                }
+            }
+        }
+
+        function saveChat() {
+            alert('Chat saved locally!');
+        }
+
+        function shareChat() {
+            const shareData = JSON.stringify(chats.find(c => c.id === currentChatId));
+            alert(`Share this JSON: ${shareData}`);
+        }
+
+        function loadChat(id) {
+            currentChatId = id;
+            localStorage.setItem('currentChatId', id);
+            const chat = chats.find(c => c.id === id);
+            conversationHistory = chat.messages;
+            renderMessages();
+            renderChatList();
+        }
+
+        function saveChats() {
+            localStorage.setItem('chats', JSON.stringify(chats));
+            renderChatList();
+        }
+
+        function renderChatList() {
+            const list = document.getElementById('chat-list');
+            list.innerHTML = chats.map(c => `<div class="chat-item ${c.id === currentChatId ? 'active' : ''}" onclick="loadChat('${c.id}')">${c.title}</div>`).join('');
+        }
+
+        function view(v) {
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            document.getElementById('view-'+v).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('btn-'+v);
+            if (btn) btn.classList.add('active');
+            document.getElementById('chat-bar').style.display = v === 'chat' ? 'flex' : 'none';
+        }
+
+        function checkKey(e) { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+
+        function toggleChip(el) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-prompt');
+            const text = input.value.trim();
+            if(!text) return;
+            renderMsg('user', text);
+            conversationHistory.push({ role: 'user', content: text });
+            updateCurrentChat();
+            input.value = '';
+
+            let response = await getResponse(text);
+            renderMsg('ai', response);
+            conversationHistory.push({ role: 'ai', content: response });
+            updateCurrentChat();
+        }
+
+        async function getResponse(input) {
+            const low = input.toLowerCase();
+            const isDeep = document.getElementById('deep-research').classList.contains('active');
+            const isSmartPlugin = plugins.smartthink;
+            let res = '';
+
+            // Analyze input implicitly with more advanced matching
+            if (low.includes('hi') || low.includes('hello') || low.includes('hey')) {
+                res = 'Hey! Ready for Minecraft or code?';
+            } else if (low.includes('diamond')) {
+                res = 'Diamonds at Y -59. Use Fortune pick.';
+                if (isDeep) res += await deepResearch('minecraft diamonds location');
+            } else if (low.includes('crafting table')) {
+                res = '4 planks in square.';
+                if (isDeep) res += await deepResearch('minecraft crafting table recipe');
+            } else if (low.includes('dumb')) {
+                res = 'Improved now. Ask away.';
+            } else if (low.includes('minecraft') || low.includes('mc')) {
+                res = 'MC tips? Servers or builds?';
+                if (conversationHistory.length > 1 && conversationHistory[conversationHistory.length - 2].content.toLowerCase().includes('build')) {
+                    res = 'Redstone farms: Try pistons.';
+                }
+                if (isDeep) res += await deepResearch('minecraft tips');
+            } else if (low.includes('code') || low.includes('programming')) {
+                res = 'Coding? JS example: async fetch.';
+                if (isDeep) res += await deepResearch('programming tips');
+            } else if (low.includes('shop') || low.includes('buy')) {
+                res = 'Marketplace has gear. Check balance.';
+            } else if (low.includes('balance') || low.includes('coins')) {
+                res = `${balance} coins.`;
+            } else if (low.includes('weather') || low.includes('time')) {
+                res = new Date().toLocaleString();
+            } else if (low.includes('joke')) {
+                res = 'Creeper therapy: TNT-sion!';
+            } else if (low.includes('help')) {
+                res = 'Minecraft, code, shop info.';
+            } else {
+                res = 'Clarify? Minecraft or code?';
+                if (conversationHistory.length > 1) {
+                    const prev = conversationHistory[conversationHistory.length - 2].content.toLowerCase();
+                    if (prev.includes('minecraft')) res = 'More MC: End strategies.';
+                    if (prev.includes('code')) res = 'Debug: console.log.';
+                }
+            }
+
+            // Make smarter with plugin
+            if (isSmartPlugin) {
+                res = `Enhanced: ${res} (Smart Plugin active)`;
+            }
+
+            return res;
+        }
+
+        async function deepResearch(query) {
+            try {
+                const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${encodeURIComponent(query)}&origin=*`);
+                const data = await res.json();
+                const page = data.query.search[0];
+                if (page) {
+                    const summaryRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro&explaintext&titles=${encodeURIComponent(page.title)}&origin=*`);
+                    const summaryData = await summaryRes.json();
+                    const extract = Object.values(summaryData.query.pages)[0].extract;
+                    return ` Research: ${extract.slice(0, 200)}...`;
+                }
+            } catch (e) {}
+            return ' No deep info found.';
+        }
+
+        function renderMsg(role, text) {
+            const box = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            const img = role === 'ai' ? 'logo.png' : 'https://ui-avatars.com/api/?name=U&background=4a90e2&color=fff';
+            div.innerHTML = `<img src="${img}" class="avatar"><div class="msg-content">${text}</div>`;
+            box.appendChild(div);
+            document.querySelector('.viewport').scrollTop = document.querySelector('.viewport').scrollHeight;
+        }
+
+        function renderMessages() {
+            const box = document.getElementById('chat-messages');
+            box.innerHTML = '';
+            conversationHistory.forEach(m => renderMsg(m.role, m.content));
+        }
+
+        function updateCurrentChat() {
+            const chat = chats.find(c => c.id === currentChatId);
+            chat.messages = conversationHistory;
+            saveChats();
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('market-items');
+            grid.innerHTML = items.map(i => {
+                let total = i.price * qties[i.id];
+                let isAffordable = balance >= total;
+                return `
+                    <div class="shop-item">
+                        <h3>${i.name}</h3>
+                        <div class="qty-control">
+                            <button onclick="updateQty('${i.id}', -1)" style="background:none; border:none; color:var(--text-main); cursor:pointer;">-</button>
+                            <span>${qties[i.id]}</span>
+                            <button onclick="updateQty('${i.id}', 1)" style="background:none; border:none; color:var(--text-main); cursor:pointer;">+</button>
+                            <span style="color:var(--gold); font-weight:bold;">${total} Coins</span>
+                        </div>
+                        <button class="buy-btn ${isAffordable ? '' : 'disabled'}" onclick="buy('${i.id}')">
+                            ${isAffordable ? 'Purchase' : 'Insufficient Funds'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('coin-display').innerText = balance.toLocaleString();
+            localStorage.setItem('coins', balance);
+        }
+
+        function updateQty(id, d) { qties[id] = Math.max(1, qties[id] + d); renderShop(); }
+
+        function buy(id) {
+            const item = items.find(i => i.id === id);
+            const total = item.price * qties[id];
+            if (balance < total) return;
+            balance -= total;
+            if (id === 'smartthink') {
+                plugins.smartthink = true;
+                localStorage.setItem('plugins', JSON.stringify(plugins));
+                alert('Smarter Thinking Plugin activated!');
+            } else {
+                const code = Array.from({length:20}, () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random()*36)]).join('');
+                alert(`Purchase Successful!\n\nItem: ${qties[id]}x ${item.name}\nCode: ${code}\n\nRedeem in Discord.`);
+            }
+            renderShop();
+        }
+
+        function redeem() {
+            const val = document.getElementById('code-input').value.trim();
+            if(usedCodes.includes(val)) return alert("Code already used.");
+            if(val === 'RELEASE!') { balance += 50; usedCodes.push(val); localStorage.setItem('used', JSON.stringify(usedCodes)); renderShop(); alert("Added 50 coins!"); }
+            else alert("Invalid code.");
+        }
+
+        // Init
+        renderShop();
+        renderChatList();
+    </script>
+</body>
+</html>
