@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dino Universe | Raw Survival SMP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@300;500;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --nether-red: #ff4d4d;
-            --overworld-green: #4ade80;
-            --end-purple: #c084fc;
             --dino-gold: #fde047;
         }
 
@@ -18,15 +16,15 @@
             background-color: #030303;
             color: #ffffff;
             font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            padding: 0;
             overflow-x: hidden;
-            visibility: hidden; /* Prevent flash of unstyled content */
         }
 
         h1, h2, h3, h4, .bungee { font-family: 'Bungee', cursive; }
-        .fraktur { font-family: 'UnifrakturMaguntia', serif; }
 
         .hero-gradient {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(3,3,3,1) 100%),
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(3,3,3,1) 100%),
                         url('https://images.unsplash.com/photo-1587573089734-09cb99c0a0b9?auto=format&fit=crop&q=80&w=1920');
             background-size: cover;
             background-position: center;
@@ -34,45 +32,30 @@
 
         .card-blur {
             backdrop-filter: blur(16px);
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(20, 20, 20, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .card-blur:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .toast {
-            visibility: hidden;
-            min-width: 280px;
-            background-color: #111;
-            color: #fff;
-            text-align: center;
-            border-radius: 8px;
-            padding: 16px;
+        /* Loading Screen */
+        #loading-screen {
             position: fixed;
+            inset: 0;
+            background: #030303;
             z-index: 9999;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            border: 2px solid #ff4d4d;
-            font-family: 'Bungee', cursive;
-            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
         }
 
-        .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-
-        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
-
+        /* Auth Overlay */
         #auth-overlay {
             position: fixed;
             inset: 0;
             background: #050505;
             z-index: 5000;
-            display: flex;
+            display: none; /* Controlled by JS */
             align-items: center;
             justify-content: center;
         }
@@ -89,20 +72,10 @@
             border-radius: 6px;
             outline: none;
         }
-        input:focus { border-color: #ff4d4d; }
-
-        .loading-spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #ff4d4d;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        input:focus { border-color: var(--nether-red); }
 
         .btn-primary {
-            background: #ff4d4d;
+            background: var(--nether-red);
             color: white;
             padding: 14px;
             width: 100%;
@@ -110,107 +83,111 @@
             border-radius: 6px;
             transition: all 0.2s;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .btn-primary:hover { background: #e60000; transform: scale(1.02); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background: #111;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 10000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            border: 1px solid var(--nether-red);
+            font-family: 'Bungee';
+        }
+        .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--nether-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+    <!-- INITIAL LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="spinner mb-4"></div>
+        <p class="bungee text-xs tracking-widest animate-pulse">CONNECTING TO REALM...</p>
+    </div>
+
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay">
-        <!-- LOGIN BOX -->
         <div id="login-box" class="w-full max-w-md p-6">
             <h1 class="text-4xl text-center mb-8 bungee italic">DINO <span class="text-red-600">UNIVERSE</span></h1>
-            <div class="card-blur p-8 rounded-2xl shadow-2xl border border-white/10">
+            <div class="card-blur p-8 rounded-2xl shadow-2xl">
                 <h2 class="bungee text-xl mb-6 text-center text-gray-400">--- Access Realm ---</h2>
-                
-                <input type="text" id="login-user" placeholder="USERNAME" autocomplete="username">
-                <input type="password" id="login-pass" placeholder="PASSWORD" autocomplete="current-password">
-                
-                <div class="flex items-center gap-2 mb-6 cursor-pointer" id="stay-signed-container">
+                <input type="text" id="login-user" placeholder="USERNAME">
+                <input type="password" id="login-pass" placeholder="PASSWORD">
+                <div class="flex items-center gap-2 mb-6">
                     <input type="checkbox" id="login-stay" class="w-4 h-4 accent-red-600">
                     <label for="login-stay" class="text-[10px] bungee text-gray-500 cursor-pointer">REMEMBER IDENTITY</label>
                 </div>
-
-                <button id="login-btn" class="btn-primary flex items-center justify-center gap-2">
-                    <span id="login-text">ENTER REALM</span>
-                    <div id="login-loader" class="loading-spinner hidden"></div>
-                </button>
-
-                <div class="mt-6 text-center border-t border-white/5 pt-6">
+                <button id="login-btn" class="btn-primary">ENTER REALM</button>
+                <div class="mt-6 text-center pt-6 border-t border-white/5">
                     <button onclick="toggleAuth('reg')" class="text-xs bungee text-red-500 hover:underline">CREATE NEW ACCOUNT</button>
                 </div>
             </div>
         </div>
 
-        <!-- REGISTER BOX -->
         <div id="reg-box" class="w-full max-w-md p-6 hidden">
             <h1 class="text-4xl text-center mb-8 bungee italic">DINO <span class="text-red-600">UNIVERSE</span></h1>
-            <div class="card-blur p-8 rounded-2xl shadow-2xl border border-white/10">
+            <div class="card-blur p-8 rounded-2xl shadow-2xl">
                 <h2 class="bungee text-xl mb-6 text-center text-gray-400">--- New Identity ---</h2>
-                
-                <input type="text" id="reg-user" placeholder="CHOOSE USERNAME">
-                <input type="email" id="reg-email" placeholder="EMAIL ADDRESS">
+                <input type="text" id="reg-user" placeholder="USERNAME">
+                <input type="email" id="reg-email" placeholder="EMAIL">
                 <input type="password" id="reg-pass" placeholder="PASSWORD">
                 <input type="password" id="reg-confirm" placeholder="CONFIRM PASSWORD">
-
-                <button id="reg-btn" class="btn-primary flex items-center justify-center gap-2 mt-2">
-                    <span id="reg-text">REGISTER</span>
-                    <div id="reg-loader" class="loading-spinner hidden"></div>
-                </button>
-
-                <div class="mt-6 text-center border-t border-white/5 pt-6">
+                <button id="reg-btn" class="btn-primary mt-2">REGISTER</button>
+                <div class="mt-6 text-center pt-6 border-t border-white/5">
                     <button onclick="toggleAuth('login')" class="text-xs bungee text-gray-500 hover:text-white">BACK TO LOGIN</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTENT (Initially Hidden) -->
+    <!-- MAIN CONTENT -->
     <div id="main-content">
-        <nav class="fixed w-full z-40 px-6 py-6 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/5">
-            <div class="text-2xl bungee tracking-tighter text-white uppercase italic">
-                DINO <span class="text-red-600">UNIVERSE</span>
-            </div>
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 bg-yellow-400/10 px-4 py-2 rounded border border-yellow-400/20">
-                    <span class="text-yellow-400 bungee text-xs">🦖 <span id="balance-display">0</span></span>
+        <nav class="fixed w-full z-40 px-6 py-4 flex justify-between items-center bg-black/90 backdrop-blur-md border-b border-white/5">
+            <div class="text-xl bungee italic">DINO <span class="text-red-600">UNIVERSE</span></div>
+            <div class="flex items-center gap-4">
+                <div class="bg-yellow-400/10 px-3 py-2 rounded border border-yellow-400/20 text-yellow-400 bungee text-xs">
+                    🦖 <span id="balance-display">0</span>
                 </div>
-                <button onclick="handleLogout()" class="text-red-500 hover:text-white bungee border border-red-500/30 px-3 py-1 rounded hover:bg-red-500/20 transition text-[10px]">LOGOUT</button>
+                <button onclick="handleLogout()" class="text-red-500 bungee text-[10px] border border-red-500/30 px-3 py-1 rounded">LOGOUT</button>
             </div>
         </nav>
 
         <section class="relative h-screen flex items-center justify-center hero-gradient px-6 text-center">
-            <div class="max-w-4xl">
+            <div>
                 <h1 class="text-6xl md:text-9xl bungee italic mb-4">DINO UNIVERSE</h1>
                 <p class="text-gray-400 text-lg md:text-xl mb-12 bungee tracking-widest">RAW SURVIVAL | NO RULES</p>
-                <div class="flex flex-col md:flex-row gap-6 justify-center">
-                    <button class="px-12 py-5 bg-white text-black bungee hover:invert transition-all rounded">SERVER IP</button>
-                    <a href="#shop" class="px-12 py-5 bg-yellow-500 text-black bungee hover:bg-yellow-400 transition-all rounded">VISIT SHOP</a>
-                </div>
+                <button class="px-12 py-5 bg-white text-black bungee hover:invert transition-all rounded">SERVER IP</button>
             </div>
         </section>
 
-        <!-- Shop (Snippet) -->
-        <section id="shop" class="py-32 px-6 max-w-7xl mx-auto">
-            <h2 class="text-5xl bungee italic mb-12 text-center">BLACK MARKET</h2>
+        <section id="shop" class="py-24 px-6 max-w-7xl mx-auto">
+            <h2 class="text-4xl bungee italic mb-12 text-center">BLACK MARKET</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card-blur p-8 rounded-xl border-t-4 border-cyan-400">
-                    <h3 class="text-2xl bungee mb-2">DIAMOND SET</h3>
-                    <p class="text-yellow-400 bungee mb-6">150 COINS</p>
-                    <button onclick="buyItem('Diamond Set', 150)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
-                </div>
                 <div class="card-blur p-8 rounded-xl border-t-4 border-red-600">
-                    <h3 class="text-2xl bungee mb-2">NETHERITE SET</h3>
-                    <p class="text-yellow-400 bungee mb-6">300 COINS</p>
-                    <button onclick="buyItem('Netherite Set', 300)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
-                </div>
-                <div class="card-blur p-8 rounded-xl border-t-4 border-gray-400">
-                    <h3 class="text-2xl bungee mb-2">GOD TOOLS</h3>
-                    <p class="text-yellow-400 bungee mb-6">250 COINS</p>
-                    <button onclick="buyItem('God Tools', 250)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
+                    <h3 class="text-2xl bungee mb-2">STARTER PACK</h3>
+                    <p class="text-yellow-400 bungee mb-6">FREE</p>
+                    <button onclick="buyItem('Starter Pack', 0)" class="w-full py-3 bg-white/5 hover:bg-white hover:text-black bungee transition">CLAIM</button>
                 </div>
             </div>
         </section>
@@ -221,11 +198,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURATION (MUST BE VALID FOR GITHUB)
         const firebaseConfig = {
-            apiKey: "", // Left empty for runtime injection or manual filling
+            apiKey: "",
             authDomain: "dino-universe-auth.firebaseapp.com",
             projectId: "dino-universe-auth",
             storageBucket: "dino-universe-auth.firebasestorage.app",
@@ -233,35 +209,32 @@
             appId: "1:123456789:web:abcdef"
         };
 
-        // Initialize
-        let app, auth, db;
-        try {
-            const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-            app = initializeApp(config);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (e) {
-            console.error("Firebase init failed", e);
-        }
+        const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-v1';
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe-v1';
         let userState = { username: '', balance: 0 };
 
-        // 1. HANDLE AUTH STATE
+        // INITIAL CHECK
         onAuthStateChanged(auth, async (user) => {
+            const loader = document.getElementById('loading-screen');
+            
             if (user) {
-                // Try to load profile
                 const profile = await loadProfile(user.uid);
                 if (profile) {
                     showApp();
                 } else {
-                    // Authenticated but no profile yet (happens during registration)
-                    hideApp();
+                    showAuth();
                 }
             } else {
-                hideApp();
+                showAuth();
             }
-            document.body.style.visibility = 'visible';
+            
+            // Hide initial loader
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
         });
 
         async function loadProfile(uid) {
@@ -272,11 +245,10 @@
                     document.getElementById('balance-display').innerText = userState.balance;
                     return userState;
                 }
-            } catch (e) { console.error("Profile load error", e); }
+            } catch (e) { console.error(e); }
             return null;
         }
 
-        // 2. REGISTRATION LOGIC
         window.toggleAuth = (mode) => {
             document.getElementById('login-box').classList.toggle('hidden', mode === 'reg');
             document.getElementById('reg-box').classList.toggle('hidden', mode === 'login');
@@ -288,135 +260,67 @@
             const pass = document.getElementById('reg-pass').value;
             const conf = document.getElementById('reg-confirm').value;
 
-            if (!user || !email || !pass) return toast("FILL ALL FIELDS!");
-            if (pass !== conf) return toast("PASSWORDS DON'T MATCH!");
-            if (pass.length < 4) return toast("PASSWORD TOO SHORT!");
-
-            setLoading('reg', true);
+            if (!user || !email || !pass || pass !== conf) return toast("CHECK FIELDS!");
 
             try {
-                // Check if username taken
-                const nameKey = user.toLowerCase();
-                const nameRef = doc(db, 'artifacts', appId, 'public', 'data', 'usernames', nameKey);
+                const nameRef = doc(db, 'artifacts', appId, 'public', 'data', 'usernames', user.toLowerCase());
                 const nameSnap = await getDoc(nameRef);
+                if (nameSnap.exists()) return toast("USERNAME TAKEN!");
 
-                if (nameSnap.exists()) {
-                    setLoading('reg', false);
-                    return toast("USERNAME ALREADY TAKEN!");
-                }
-
-                // Auth and Save
                 await signInAnonymously(auth);
                 const uid = auth.currentUser.uid;
+                const profileData = { username: user, email, password: pass, balance: 100 };
 
-                const profileData = {
-                    username: user,
-                    email: email,
-                    password: pass,
-                    balance: 100,
-                    createdAt: Date.now()
-                };
-
-                // CRITICAL: Set username map first, then profile
                 await setDoc(nameRef, { uid });
                 await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), profileData);
-
-                toast("REGISTRATION SUCCESSFUL!");
-                setLoading('reg', false);
-                location.reload(); // Refresh to trigger state listener
-            } catch (e) {
-                console.error("Reg Error:", e);
-                setLoading('reg', false);
-                toast("REGISTRATION FAILED: Check Console");
-            }
+                
+                toast("REGISTERED!");
+                setTimeout(() => location.reload(), 1000);
+            } catch (e) { toast("ERROR: " + e.message); }
         });
 
-        // 3. LOGIN LOGIC
         document.getElementById('login-btn').addEventListener('click', async () => {
             const user = document.getElementById('login-user').value.trim();
             const pass = document.getElementById('login-pass').value;
             const stay = document.getElementById('login-stay').checked;
 
-            if (!user || !pass) return toast("ENTER IDENTITY & KEY!");
-
-            setLoading('login', true);
-
             try {
-                // Set persistence first
                 await setPersistence(auth, stay ? browserLocalPersistence : browserSessionPersistence);
-
-                const nameKey = user.toLowerCase();
-                const nameSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'usernames', nameKey));
-
-                if (!nameSnap.exists()) {
-                    setLoading('login', false);
-                    return toast("IDENTITY NOT FOUND!");
-                }
-
-                const targetUid = nameSnap.data().uid;
-                const profileSnap = await getDoc(doc(db, 'artifacts', appId, 'users', targetUid, 'profile', 'data'));
-
+                const nameSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'usernames', user.toLowerCase()));
+                
+                if (!nameSnap.exists()) return toast("USER NOT FOUND!");
+                
+                const uid = nameSnap.data().uid;
+                const profileSnap = await getDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'));
+                
                 if (profileSnap.exists() && profileSnap.data().password === pass) {
-                    // Manual re-auth (simulated for anonymous bridge)
-                    // In a production app with Email/Pass, we would use signInWithEmailAndPassword
-                    // Here we are using a custom profile check on top of Anonymous ID
-                    await signInAnonymously(auth); 
-                    // Note: This is a simplified demo system. In a real system, you'd use Firebase Auth email providers.
-                    
-                    toast("WELCOME BACK, " + user.toUpperCase());
-                    location.reload();
+                    await signInAnonymously(auth);
+                    toast("LOGGED IN!");
+                    setTimeout(() => location.reload(), 1000);
                 } else {
-                    setLoading('login', false);
-                    toast("INVALID PASSWORD!");
+                    toast("WRONG PASSWORD!");
                 }
-            } catch (e) {
-                setLoading('login', false);
-                toast("LOGIN FAILED!");
-            }
+            } catch (e) { toast("LOGIN FAILED!"); }
         });
 
-        // 4. UTILS
-        function toast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.className = "toast show";
-            setTimeout(() => t.className = "toast", 3000);
-        }
-
-        function setLoading(type, active) {
-            const btn = document.getElementById(`${type}-btn`);
-            const text = document.getElementById(`${type}-text`);
-            const loader = document.getElementById(`${type}-loader`);
-            btn.disabled = active;
-            text.classList.toggle('hidden', active);
-            loader.classList.toggle('hidden', !active);
-        }
+        window.handleLogout = () => signOut(auth).then(() => location.reload());
 
         function showApp() {
             document.getElementById('auth-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
         }
 
-        function hideApp() {
+        function showAuth() {
             document.getElementById('auth-overlay').style.display = 'flex';
             document.getElementById('main-content').style.display = 'none';
         }
 
-        window.handleLogout = async () => {
-            await signOut(auth);
-            location.reload();
-        };
-
-        window.buyItem = async (name, cost) => {
-            if (userState.balance >= cost) {
-                userState.balance -= cost;
-                document.getElementById('balance-display').innerText = userState.balance;
-                await setDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'data'), { balance: userState.balance }, { merge: true });
-                toast("PURCHASED: " + name);
-            } else {
-                toast("NOT ENOUGH COINS!");
-            }
-        };
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = "toast show";
+            setTimeout(() => t.className = "toast", 3000);
+        }
     </script>
 </body>
 </html>
