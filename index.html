@@ -19,15 +19,11 @@
             color: #ffffff;
             font-family: 'Space Grotesk', sans-serif;
             overflow-x: hidden;
+            visibility: hidden; /* Prevent flash of unstyled content */
         }
 
-        h1, h2, h3, h4, .bungee {
-            font-family: 'Bungee', cursive;
-        }
-
-        .fraktur {
-            font-family: 'UnifrakturMaguntia', serif;
-        }
+        h1, h2, h3, h4, .bungee { font-family: 'Bungee', cursive; }
+        .fraktur { font-family: 'UnifrakturMaguntia', serif; }
 
         .hero-gradient {
             background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(3,3,3,1) 100%),
@@ -46,795 +42,381 @@
         .card-blur:hover {
             transform: translateY(-5px);
             border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-        }
-
-        /* Animations */
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .glitch {
-            position: relative;
-            color: white;
-        }
-        
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.8;
-        }
-        
-        .glitch::before { color: #ff00c1; z-index: -1; animation: glitch 0.3s infinite; }
-        .glitch::after { color: #00fff9; z-index: -2; animation: glitch 0.3s reverse infinite; }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
         }
 
         .toast {
             visibility: hidden;
-            min-width: 250px;
+            min-width: 280px;
             background-color: #111;
             color: #fff;
             text-align: center;
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 16px;
             position: fixed;
-            z-index: 5000;
+            z-index: 9999;
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
-            border: 1px solid white;
-            font-weight: bold;
+            border: 2px solid #ff4d4d;
+            font-family: 'Bungee', cursive;
+            font-size: 12px;
         }
 
-        .toast.show {
-            visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        }
+        .toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 200;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
 
-        /* Auth Overlay */
         #auth-overlay {
             position: fixed;
             inset: 0;
             background: #050505;
-            z-index: 4000;
+            z-index: 5000;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-y: auto;
         }
 
-        /* Main Content Container */
-        #main-content {
-            display: none; /* Hidden until auth */
-        }
+        #main-content { display: none; }
 
         input {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             color: white;
             padding: 14px;
             width: 100%;
             margin-bottom: 12px;
+            border-radius: 6px;
             outline: none;
-            font-family: 'Space Grotesk', sans-serif;
-            border-radius: 4px;
-            transition: border-color 0.3s;
         }
         input:focus { border-color: #ff4d4d; }
 
-        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
-        
         .loading-spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: #ff4d4d;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #ff4d4d;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        #director-reveal, #pixel-story {
-            display: none;
-            animation: fadeInUp 0.8s ease-out;
+        .btn-primary {
+            background: #ff4d4d;
+            color: white;
+            padding: 14px;
+            width: 100%;
+            font-family: 'Bungee';
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .pixel-skull:hover {
-            color: #ff4d4d;
-            cursor: pointer;
-            text-shadow: 0 0 15px #ff0000;
-        }
+        .btn-primary:hover { background: #e60000; transform: scale(1.02); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
-<body class="transition-opacity duration-700">
+<body>
 
-    <!-- AUTHENTICATION OVERLAY -->
+    <!-- AUTH OVERLAY -->
     <div id="auth-overlay">
-        <!-- Login Form -->
-        <div id="login-page" class="w-full max-w-md p-6 fade-in-up">
-            <h2 class="text-5xl text-center mb-8 bungee italic tracking-tighter">DINO <span class="text-red-600">UNIVERSE</span></h2>
-            <div class="card-blur p-10 rounded-xl shadow-2xl">
-                <h3 class="bungee text-2xl mb-8 border-b border-white/10 pb-4 text-center">---Login----</h3>
+        <!-- LOGIN BOX -->
+        <div id="login-box" class="w-full max-w-md p-6">
+            <h1 class="text-4xl text-center mb-8 bungee italic">DINO <span class="text-red-600">UNIVERSE</span></h1>
+            <div class="card-blur p-8 rounded-2xl shadow-2xl border border-white/10">
+                <h2 class="bungee text-xl mb-6 text-center text-gray-400">--- Access Realm ---</h2>
                 
-                <div class="space-y-1 mb-4">
-                    <label class="text-[10px] bungee text-gray-500 ml-1">USER USERNAME/NAME</label>
-                    <input type="text" id="login-username" placeholder="Enter identity...">
+                <input type="text" id="login-user" placeholder="USERNAME" autocomplete="username">
+                <input type="password" id="login-pass" placeholder="PASSWORD" autocomplete="current-password">
+                
+                <div class="flex items-center gap-2 mb-6 cursor-pointer" id="stay-signed-container">
+                    <input type="checkbox" id="login-stay" class="w-4 h-4 accent-red-600">
+                    <label for="login-stay" class="text-[10px] bungee text-gray-500 cursor-pointer">REMEMBER IDENTITY</label>
                 </div>
 
-                <div class="space-y-1 mb-6">
-                    <label class="text-[10px] bungee text-gray-500 ml-1">USER PASSWORD</label>
-                    <input type="password" id="login-password" placeholder="••••••••">
-                </div>
-                
-                <div class="flex items-center gap-3 mb-8 group cursor-pointer" onclick="document.getElementById('stay-signed-in').click()">
-                    <input type="checkbox" id="stay-signed-in" class="w-4 h-4 accent-red-600 cursor-pointer">
-                    <label for="stay-signed-in" class="text-xs text-gray-400 bungee cursor-pointer group-hover:text-white transition">[ ] STAY SIGNED IN</label>
-                </div>
+                <button id="login-btn" class="btn-primary flex items-center justify-center gap-2">
+                    <span id="login-text">ENTER REALM</span>
+                    <div id="login-loader" class="loading-spinner hidden"></div>
+                </button>
 
-                <button onclick="performLogin()" class="w-full py-4 bg-white text-black bungee tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-lg hover:shadow-red-900/20 rounded">ENTER REALM</button>
-                
-                <div class="mt-8 text-center pt-4 border-t border-white/5">
-                    <button onclick="toggleAuth(true)" class="text-red-500 text-xs bungee hover:text-red-400 hover:underline tracking-widest">REGISTER NEW ACCOUNT</button>
+                <div class="mt-6 text-center border-t border-white/5 pt-6">
+                    <button onclick="toggleAuth('reg')" class="text-xs bungee text-red-500 hover:underline">CREATE NEW ACCOUNT</button>
                 </div>
             </div>
         </div>
 
-        <!-- Register Form -->
-        <div id="register-page" class="hidden w-full max-w-md p-6 fade-in-up">
-            <h2 class="text-5xl text-center mb-8 bungee italic tracking-tighter">DINO <span class="text-red-600">UNIVERSE</span></h2>
-            <div class="card-blur p-10 rounded-xl shadow-2xl">
-                <h3 class="bungee text-2xl mb-8 border-b border-white/10 pb-4 text-center">---Register----</h3>
+        <!-- REGISTER BOX -->
+        <div id="reg-box" class="w-full max-w-md p-6 hidden">
+            <h1 class="text-4xl text-center mb-8 bungee italic">DINO <span class="text-red-600">UNIVERSE</span></h1>
+            <div class="card-blur p-8 rounded-2xl shadow-2xl border border-white/10">
+                <h2 class="bungee text-xl mb-6 text-center text-gray-400">--- New Identity ---</h2>
                 
-                <div class="space-y-4 mb-6">
-                    <div>
-                        <label class="text-[10px] bungee text-gray-500 ml-1">[USERNAME]</label>
-                        <input type="text" id="reg-username" placeholder="Choose identity...">
-                    </div>
-                    <div>
-                        <label class="text-[10px] bungee text-gray-500 ml-1">[PASSWORD]</label>
-                        <input type="password" id="reg-password" placeholder="••••••••">
-                    </div>
-                    <div>
-                        <label class="text-[10px] bungee text-gray-500 ml-1">[E-MAIL]</label>
-                        <input type="email" id="reg-email" placeholder="email@example.com">
-                    </div>
-                    <div>
-                        <label class="text-[10px] bungee text-gray-500 ml-1">[CONFIRM PASSWORD]</label>
-                        <input type="password" id="reg-confirm" placeholder="••••••••">
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-3 mb-8 group cursor-pointer" onclick="document.getElementById('reg-stay-signed-in').click()">
-                    <input type="checkbox" id="reg-stay-signed-in" class="w-4 h-4 accent-red-600 cursor-pointer">
-                    <label for="reg-stay-signed-in" class="text-xs text-gray-400 bungee cursor-pointer group-hover:text-white transition">[ ] STAY SIGNED IN</label>
-                </div>
+                <input type="text" id="reg-user" placeholder="CHOOSE USERNAME">
+                <input type="email" id="reg-email" placeholder="EMAIL ADDRESS">
+                <input type="password" id="reg-pass" placeholder="PASSWORD">
+                <input type="password" id="reg-confirm" placeholder="CONFIRM PASSWORD">
 
-                <button onclick="performRegister()" class="w-full py-4 bg-red-600 text-white bungee tracking-widest hover:bg-red-700 transition-all shadow-lg shadow-red-900/20 rounded">CREATE ACCOUNT</button>
-                
-                <div class="mt-8 text-center pt-4 border-t border-white/5">
-                    <button onclick="toggleAuth(false)" class="text-gray-500 text-xs bungee hover:text-white tracking-widest">BACK TO LOGIN</button>
+                <button id="reg-btn" class="btn-primary flex items-center justify-center gap-2 mt-2">
+                    <span id="reg-text">REGISTER</span>
+                    <div id="reg-loader" class="loading-spinner hidden"></div>
+                </button>
+
+                <div class="mt-6 text-center border-t border-white/5 pt-6">
+                    <button onclick="toggleAuth('login')" class="text-xs bungee text-gray-500 hover:text-white">BACK TO LOGIN</button>
                 </div>
             </div>
-        </div>
-
-        <div id="auth-loading" class="hidden flex flex-col items-center justify-center absolute inset-0 bg-black/95 z-50">
-            <div class="loading-spinner mb-4"></div>
-            <p class="bungee text-xs tracking-widest text-white animate-pulse">ESTABLISHING UPLINK...</p>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT (Initially Hidden) -->
     <div id="main-content">
-        <!-- Navigation -->
         <nav class="fixed w-full z-40 px-6 py-6 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/5">
             <div class="text-2xl bungee tracking-tighter text-white uppercase italic">
                 DINO <span class="text-red-600">UNIVERSE</span>
             </div>
-            <div class="hidden md:flex space-x-8 text-[10px] font-bold uppercase tracking-[0.2em] items-center">
-                <a href="#about" class="hover:text-red-500 transition">The World</a>
-                <a href="#members" class="hover:text-blue-400 transition">Members</a>
-                <a href="#shop" class="hover:text-yellow-400 transition">Black Market</a>
-                <button onclick="handleQuests()" class="hover:text-purple-400 transition cursor-pointer">Quests</button>
+            <div class="flex items-center gap-6">
                 <div class="flex items-center gap-2 bg-yellow-400/10 px-4 py-2 rounded border border-yellow-400/20">
                     <span class="text-yellow-400 bungee text-xs">🦖 <span id="balance-display">0</span></span>
                 </div>
-                <button onclick="signOutUser()" class="text-red-500 hover:text-white bungee border border-red-500/30 px-3 py-1 rounded hover:bg-red-500/20 transition">LOGOUT</button>
+                <button onclick="handleLogout()" class="text-red-500 hover:text-white bungee border border-red-500/30 px-3 py-1 rounded hover:bg-red-500/20 transition text-[10px]">LOGOUT</button>
             </div>
         </nav>
 
-        <!-- Hero Section -->
-        <section class="relative h-screen flex items-center justify-center hero-gradient px-6">
-            <div class="text-center z-10 max-w-5xl fade-in-up delay-100">
-                <p class="text-red-600 font-bold tracking-[0.5em] uppercase mb-6 bungee text-sm">NOTHING IS SCRIPTED. EVERYTHING IS LETHAL.</p>
-                <h1 class="text-6xl md:text-9xl font-black mb-8 leading-none italic uppercase glitch" data-text="DINO UNIVERSE">
-                    DINO UNIVERSE
-                </h1>
-                <p class="text-gray-300 text-lg md:text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed tracking-wide">
-                    Experience raw survival. Like Unstable SMP, but without the safety net. 
-                    No scripts. No retakes. Just 4 Rulers fighting for the Overworld and the Nether.
-                </p>
+        <section class="relative h-screen flex items-center justify-center hero-gradient px-6 text-center">
+            <div class="max-w-4xl">
+                <h1 class="text-6xl md:text-9xl bungee italic mb-4">DINO UNIVERSE</h1>
+                <p class="text-gray-400 text-lg md:text-xl mb-12 bungee tracking-widest">RAW SURVIVAL | NO RULES</p>
                 <div class="flex flex-col md:flex-row gap-6 justify-center">
-                    <a href="#join" class="px-12 py-5 bg-white text-black font-black bungee tracking-widest hover:invert transition-all rounded shadow-lg shadow-white/10">
-                        JOIN THE SERVER
-                    </a>
-                    <a href="#shop" class="px-12 py-5 bg-yellow-500 text-black font-black bungee tracking-widest hover:bg-yellow-400 transition-all rounded shadow-lg shadow-yellow-500/20">
-                        VISIT SHOP
-                    </a>
+                    <button class="px-12 py-5 bg-white text-black bungee hover:invert transition-all rounded">SERVER IP</button>
+                    <a href="#shop" class="px-12 py-5 bg-yellow-500 text-black bungee hover:bg-yellow-400 transition-all rounded">VISIT SHOP</a>
                 </div>
             </div>
         </section>
 
-        <!-- Redeem Section -->
-        <section class="py-16 bg-zinc-950 border-y border-white/5 text-white px-6">
-            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 fade-in-up delay-200">
-                <div>
-                    <h3 class="bungee text-3xl uppercase italic mb-2">Secret Codes</h3>
-                    <p class="text-gray-500 text-xs tracking-widest">ENTER PROMO CODES OR SECRETS</p>
+        <!-- Shop (Snippet) -->
+        <section id="shop" class="py-32 px-6 max-w-7xl mx-auto">
+            <h2 class="text-5xl bungee italic mb-12 text-center">BLACK MARKET</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card-blur p-8 rounded-xl border-t-4 border-cyan-400">
+                    <h3 class="text-2xl bungee mb-2">DIAMOND SET</h3>
+                    <p class="text-yellow-400 bungee mb-6">150 COINS</p>
+                    <button onclick="buyItem('Diamond Set', 150)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
                 </div>
-                <div class="flex w-full md:w-auto gap-2">
-                    <input type="text" id="redeem-input" placeholder="ENTER CODE..." class="!mb-0 px-6 py-4 bg-white/5 border border-white/10 text-white placeholder:text-gray-600 font-bold focus:outline-none w-full md:w-80 uppercase bungee tracking-widest">
-                    <button onclick="handleRedeem()" class="px-10 py-4 bg-white text-black bungee hover:bg-gray-200 transition rounded font-black tracking-widest">ENTER</button>
+                <div class="card-blur p-8 rounded-xl border-t-4 border-red-600">
+                    <h3 class="text-2xl bungee mb-2">NETHERITE SET</h3>
+                    <p class="text-yellow-400 bungee mb-6">300 COINS</p>
+                    <button onclick="buyItem('Netherite Set', 300)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
                 </div>
-            </div>
-        </section>
-
-        <!-- Council Section -->
-        <section id="members" class="py-32 px-6 max-w-7xl mx-auto">
-            <div class="text-center mb-20 fade-in-up delay-300">
-                <h2 class="text-5xl md:text-7xl bungee italic mb-4">THE COUNCIL</h2>
-                <div class="h-1 w-24 bg-red-600 mx-auto mb-4"></div>
-                <p class="text-gray-500 tracking-[0.3em] font-bold uppercase text-xs">The 4 main rulers of existence</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-                <!-- Tempest -->
-                <div class="card-blur p-8 border-t-4 border-red-800 rounded-b-xl group">
-                    <div class="text-red-700 bungee text-[10px] tracking-widest mb-4">ANTAGONIST</div>
-                    <h3 class="text-3xl bungee mb-2 group-hover:text-red-500 transition">TEMPEST</h3>
-                    <p class="fraktur text-xl text-red-200 opacity-60 mb-6">"Doombringer"</p>
-                    <p class="text-gray-400 text-xs leading-loose font-medium">The embodiment of chaos. He brings nothing but destruction.</p>
-                </div>
-                
-                <!-- Mikey -->
-                <div class="card-blur p-8 border-t-4 border-blue-500 rounded-b-xl group">
-                    <div class="text-blue-400 bungee text-[10px] tracking-widest mb-4">PROTAGONIST</div>
-                    <h3 class="text-3xl bungee mb-2 group-hover:text-blue-400 transition">MIKEY</h3>
-                    <p class="fraktur text-xl text-blue-100 opacity-60 mb-6">"Puppeteer of world"</p>
-                    <p class="text-gray-400 text-xs leading-loose font-medium">The string puller. He controls the narrative from the shadows.</p>
-                </div>
-
-                <!-- Akram -->
-                <div class="card-blur p-8 border-t-4 border-green-600 rounded-b-xl group">
-                    <div class="text-green-400 bungee text-[10px] tracking-widest mb-4">PROTAGONIST</div>
-                    <h3 class="text-3xl bungee mb-2 group-hover:text-green-400 transition">AKRAM</h3>
-                    <p class="fraktur text-xl text-green-100 opacity-60 mb-6">"King of the overworld"</p>
-                    <p class="text-gray-400 text-xs leading-loose font-medium">The shield of the surface. He fights to keep the darkness at bay.</p>
-                </div>
-
-                <!-- Pixel -->
-                <div class="card-blur p-8 border-t-4 border-zinc-500 pixel-skull rounded-b-xl group" onclick="showPixelStory()">
-                    <div class="text-zinc-500 bungee text-[10px] tracking-widest mb-4">FALLEN LEGEND</div>
-                    <h3 class="text-3xl bungee mb-2 flex items-center gap-2 group-hover:text-red-600 transition">PIXEL 💀</h3>
-                    <p class="fraktur text-xl text-zinc-400 opacity-60 mb-6">"The Lost King"</p>
-                    <p class="text-gray-400 text-xs leading-loose font-medium">Click to view the archives of the Great War...</p>
-                </div>
-            </div>
-
-            <!-- Pixel Story Reveal -->
-            <div id="pixel-story" class="mt-8 bg-zinc-950 border border-red-900/50 p-12 rounded-xl text-center max-w-3xl mx-auto">
-                <h4 class="bungee text-3xl text-red-600 mb-6">THE FALL OF PIXEL</h4>
-                <p class="text-gray-300 font-serif italic text-lg leading-relaxed">
-                    "It wasn't a fair fight. The alliance of the Overworld caught Pixel off guard during the Great Siege. Outnumbered and outmaneuvered, he stood atop his fortress as it crumbled into the lava ocean. His final words were lost to the roar of the flames, but his crown remains... waiting for a new owner."
-                </p>
-                <div class="mt-8 inline-block px-4 py-1 bg-red-900/30 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] border border-red-900">STATUS: DECEASED</div>
-            </div>
-
-            <!-- Director Reveal -->
-            <div id="director-reveal" class="mt-12 bg-gradient-to-br from-red-950 to-black p-12 text-center rounded-xl border border-red-600 shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-                <div class="bungee text-white text-xs tracking-[0.5em] mb-4 animate-pulse">UNLOCKED???!!!</div>
-                <h3 class="text-6xl md:text-8xl bungee text-white italic mb-4">THE DIRECTOR</h3>
-                <p class="text-2xl font-black text-red-500 mb-8 tracking-tighter bungee">DOOMBRINGER OF REALMS</p>
-                <p class="max-w-2xl mx-auto text-gray-400 font-bold uppercase text-sm leading-relaxed tracking-wide">
-                    Appears every 2 weeks. The Doomsday owner. He exists between the cracks of reality. When the timer hits zero, he is the one who initiates the end.
-                </p>
-            </div>
-        </section>
-
-        <!-- Shop Section -->
-        <section id="shop" class="py-32 px-6 max-w-7xl mx-auto bg-black border-t border-white/5">
-            <div class="text-center mb-20">
-                <h2 class="text-5xl md:text-7xl bungee italic mb-4">BLACK MARKET</h2>
-                <p class="text-yellow-500 tracking-[0.3em] font-bold uppercase text-xs">Illegal Gear & Protection</p>
-            </div>
-
-            <!-- Pickaxes -->
-            <div class="mb-16">
-                <h3 class="bungee text-2xl text-white/50 mb-8 border-b border-white/10 pb-2">Excavation Tier</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div class="card-blur p-6 rounded hover:border-white transition cursor-default group">
-                        <h4 class="font-bold text-xl mb-1 bungee group-hover:text-gray-300">Iron Pickaxe</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">30 Coins</p>
-                        <button onclick="buyItem('Iron Pickaxe', 30)" class="w-full py-3 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded hover:border-cyan-400 transition cursor-default group">
-                        <h4 class="font-bold text-xl mb-1 bungee group-hover:text-cyan-400">Diamond Pick</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">80 Coins</p>
-                        <button onclick="buyItem('Diamond Pickaxe', 80)" class="w-full py-3 bg-white/5 hover:bg-cyan-400 text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded hover:border-gray-500 transition cursor-default group border-gray-800">
-                        <h4 class="font-bold text-xl mb-1 bungee group-hover:text-gray-400">Netherite Pick</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">200 Coins</p>
-                        <button onclick="buyItem('Netherite Pickaxe', 200)" class="w-full py-3 bg-white/5 hover:bg-gray-500 text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Arsenal -->
-            <div class="mb-16">
-                <h3 class="bungee text-2xl text-white/50 mb-8 border-b border-white/10 pb-2">Arsenal Tier</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="card-blur p-6 rounded hover:border-white transition cursor-default">
-                        <h4 class="font-bold text-lg mb-1 bungee">Iron S&A</h4>
-                        <p class="text-[10px] text-gray-500 mb-2 font-bold uppercase">Sword + Axe</p>
-                        <p class="text-yellow-400 bungee text-xs mb-4">40 Coins</p>
-                        <button onclick="buyItem('Iron Sword & Axe', 40)" class="w-full py-3 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded hover:border-cyan-400 transition cursor-default">
-                        <h4 class="font-bold text-lg mb-1 bungee">Diamond S&A</h4>
-                        <p class="text-[10px] text-gray-500 mb-2 font-bold uppercase">Sword + Axe</p>
-                        <p class="text-yellow-400 bungee text-xs mb-4">100 Coins</p>
-                        <button onclick="buyItem('Diamond Sword & Axe', 100)" class="w-full py-3 bg-white/5 hover:bg-cyan-400 text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded hover:border-gray-500 transition cursor-default">
-                        <h4 class="font-bold text-lg mb-1 bungee">Netherite S&A</h4>
-                        <p class="text-[10px] text-gray-500 mb-2 font-bold uppercase">Sword + Axe</p>
-                        <p class="text-yellow-400 bungee text-xs mb-4">300 Coins</p>
-                        <button onclick="buyItem('Netherite Sword & Axe', 300)" class="w-full py-3 bg-white/5 hover:bg-gray-500 text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded border-yellow-500/20 hover:border-yellow-400 transition cursor-default">
-                        <h4 class="font-bold text-lg mb-1 bungee text-yellow-200">God Bow</h4>
-                        <p class="text-[10px] text-yellow-500/60 mb-2 font-bold uppercase">with Spectral Arrows</p>
-                        <p class="text-yellow-400 bungee text-xs mb-4">400 Coins</p>
-                        <button onclick="buyItem('God Bow + Spectral Arrows', 400)" class="w-full py-3 bg-yellow-500/10 hover:bg-yellow-400 text-yellow-400 hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Defense -->
-            <div>
-                <h3 class="bungee text-2xl text-white/50 mb-8 border-b border-white/10 pb-2">Forgesmiths Tier</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div class="card-blur p-6 rounded hover:border-white transition cursor-default">
-                        <h4 class="font-bold text-xl mb-1 bungee">Iron Armor</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">50 Coins</p>
-                        <button onclick="buyItem('Iron Armor Set', 50)" class="w-full py-3 bg-white/5 hover:bg-white text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded hover:border-cyan-400 transition cursor-default">
-                        <h4 class="font-bold text-xl mb-1 bungee">Diamond Armor</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">150 Coins</p>
-                        <button onclick="buyItem('Diamond Armor Set', 150)" class="w-full py-3 bg-white/5 hover:bg-cyan-400 text-white hover:text-black font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
-                    <div class="card-blur p-6 rounded border-red-900 hover:border-red-600 transition cursor-default">
-                        <h4 class="font-bold text-xl mb-1 bungee text-red-200">Netherite Armor</h4>
-                        <p class="text-yellow-400 bungee text-xs mb-6">600 Coins</p>
-                        <button onclick="buyItem('Netherite Armor Set', 600)" class="w-full py-3 bg-red-900/20 hover:bg-red-600 text-red-200 hover:text-white font-bold text-xs transition bungee">PURCHASE</button>
-                    </div>
+                <div class="card-blur p-8 rounded-xl border-t-4 border-gray-400">
+                    <h3 class="text-2xl bungee mb-2">GOD TOOLS</h3>
+                    <p class="text-yellow-400 bungee mb-6">250 COINS</p>
+                    <button onclick="buyItem('God Tools', 250)" class="w-full py-4 bg-white/5 hover:bg-white hover:text-black bungee transition">PURCHASE</button>
                 </div>
             </div>
         </section>
-
-        <!-- Doomsday Section -->
-        <section id="doomsday" class="py-32 bg-red-950/10 relative overflow-hidden border-t border-red-900/20">
-            <div class="max-w-4xl mx-auto px-6 text-center">
-                <h2 class="text-red-600 text-sm font-black bungee tracking-[1em] mb-4">EVENT HORIZON</h2>
-                <h3 class="text-5xl md:text-8xl bungee italic mb-10 text-white/90">DOOMSDAY</h3>
-                <div class="fraktur text-3xl md:text-5xl text-gray-500 mb-12 leading-relaxed">
-                    "The Day of the Death"
-                </div>
-                
-                <div class="card-blur p-12 rounded-lg border-red-900/50 border bg-black/40">
-                    <p class="text-xl md:text-2xl text-red-100/80 font-light italic leading-relaxed mb-8">
-                        "Every fourteen suns, the fabric of the Universe thins. From the static of the void, he arrives—a phantom known only as <b>The Director</b>. He does not speak. He does not negotiate. He joins with one singular purpose: to purge the living."
-                    </p>
-                    <div class="inline-block px-6 py-2 border border-red-600 text-red-600 font-bold text-[10px] bungee tracking-widest">
-                        RECURRING EVERY 2 WEEKS
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Join Section -->
-        <section id="join" class="py-32 px-6">
-            <div class="max-w-5xl mx-auto bg-white p-12 md:p-20 text-black rounded-3xl">
-                <h2 class="text-5xl md:text-7xl font-black bungee italic mb-6 leading-none text-center">JOIN THE FRAY.</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                    <div class="border-b-4 border-black pb-4">
-                        <p class="text-xs font-black uppercase tracking-widest mb-2">Server Address</p>
-                        <div class="flex justify-between items-center font-bold text-2xl">
-                            <span>DinoUniverse.aternos.me</span>
-                            <button onclick="copyText('DinoUniverse.aternos.me', 'IP')"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg></button>
-                        </div>
-                    </div>
-                    <div class="border-b-4 border-black pb-4">
-                        <p class="text-xs font-black uppercase tracking-widest mb-2">Port</p>
-                        <div class="flex justify-between items-center font-bold text-2xl">
-                            <span>61641</span>
-                            <button onclick="copyText('61641', 'Port')"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg></button>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="copyFullIP()" class="w-full py-6 bg-black text-white bungee tracking-[0.2em] text-xl hover:invert transition-all rounded-xl">COPY FULL ADDRESS</button>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="py-20 text-center border-t border-white/5">
-            <div class="flex justify-center gap-10 mb-10 bungee text-xs tracking-widest uppercase">
-                <a href="#about" class="hover:text-red-500">World</a>
-                <a href="#shop" class="hover:text-yellow-400">Shop</a>
-                <a href="https://discord.gg/RW8hFGPNy4" target="_blank" class="hover:text-[#5865F2]">Discord</a>
-            </div>
-            <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">&copy; 2026 DINO UNIVERSE | RAW SURVIVAL SMP</p>
-        </footer>
     </div>
 
-    <!-- Purchase Modal -->
-    <div id="purchase-modal" class="modal">
-        <div class="bg-zinc-950 border-2 border-yellow-500 p-8 max-w-lg w-full rounded-2xl text-center shadow-2xl">
-            <h2 class="bungee text-2xl text-yellow-400 mb-4">PURCHASE SUCCESSFUL!</h2>
-            <p class="text-gray-300 mb-6 leading-relaxed text-sm">
-                You bought <span id="modal-item-name" class="font-bold text-white uppercase"></span>. Redeem code on Discord:
-            </p>
-            <div class="bg-white/5 p-4 border border-white/10 mb-8 rounded select-all">
-                <code id="verification-code" class="text-xl bungee tracking-widest text-white">ERROR-CODE</code>
-            </div>
-            <div class="flex flex-col gap-4">
-                <a href="https://discord.gg/RW8hFGPNy4" target="_blank" class="w-full py-4 bg-[#5865F2] text-white bungee rounded-lg hover:opacity-90 transition">GO TO DISCORD</a>
-                <button onclick="closeModal()" class="w-full py-3 text-gray-500 bungee text-xs hover:text-white">CLOSE</button>
-            </div>
-        </div>
-    </div>
+    <div id="toast" class="toast"></div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast bungee text-xs tracking-widest">COPIED TO CLIPBOARD</div>
-
-    <!-- Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Setup
-        let firebaseConfig;
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } else {
-            console.error("FIREBASE CONFIG MISSING: Please add your config below.");
-            firebaseConfig = {
-                // ADD YOUR FIREBASE CONFIG HERE FOR GITHUB PAGES
-                apiKey: "YOUR_API_KEY",
-                authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-                projectId: "YOUR_PROJECT_ID",
-                storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-                messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-                appId: "YOUR_APP_ID"
-            };
+        // CONFIGURATION (MUST BE VALID FOR GITHUB)
+        const firebaseConfig = {
+            apiKey: "", // Left empty for runtime injection or manual filling
+            authDomain: "dino-universe-auth.firebaseapp.com",
+            projectId: "dino-universe-auth",
+            storageBucket: "dino-universe-auth.firebasestorage.app",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        // Initialize
+        let app, auth, db;
+        try {
+            const config = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+            app = initializeApp(config);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase init failed", e);
         }
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe-v1';
+        let userState = { username: '', balance: 0 };
 
-        let userData = { balance: 0, username: '', usedCodes: [] };
-        
-        // ------------------ AUTH LOGIC ------------------
-
-        // Toggle Views
-        window.toggleAuth = (showRegister) => {
-            document.getElementById('login-page').classList.toggle('hidden', showRegister);
-            document.getElementById('register-page').classList.toggle('hidden', !showRegister);
-        };
-
-        const setLoading = (loading) => {
-            document.getElementById('auth-loading').classList.toggle('hidden', !loading);
-        };
-
-        // Auth Helper
-        const ensureSession = async (persistenceType) => {
-            if (persistenceType) {
-                await setPersistence(auth, persistenceType);
-            }
-            if (auth.currentUser) return auth.currentUser;
-            
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                try {
-                    await signInAnonymously(auth);
-                } catch (e) {
-                    console.error("Auth Failed (likely config/domain)", e);
-                    showToast("AUTH ERROR: Check Console");
-                    throw e;
-                }
-            }
-            return auth.currentUser;
-        };
-
-        // Listener
+        // 1. HANDLE AUTH STATE
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const hasProfile = await checkProfile(user.uid);
-                if (hasProfile) {
-                    revealSite();
+                // Try to load profile
+                const profile = await loadProfile(user.uid);
+                if (profile) {
+                    showApp();
+                } else {
+                    // Authenticated but no profile yet (happens during registration)
+                    hideApp();
                 }
             } else {
-                hideSite();
+                hideApp();
             }
+            document.body.style.visibility = 'visible';
         });
 
-        const revealSite = () => {
-            document.body.classList.add('authorized');
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-        };
-
-        const hideSite = () => {
-            document.body.classList.remove('authorized');
-            document.getElementById('auth-overlay').style.display = 'flex';
-            document.getElementById('main-content').style.display = 'none';
-            setLoading(false);
-        };
-
-        async function checkProfile(uid) {
+        async function loadProfile(uid) {
             try {
-                const ref = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
-                const snap = await getDoc(ref);
+                const snap = await getDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'));
                 if (snap.exists()) {
-                    userData = snap.data();
-                    if(!userData.usedCodes) userData.usedCodes = [];
-                    updateBalanceDisplay();
-                    return true;
+                    userState = snap.data();
+                    document.getElementById('balance-display').innerText = userState.balance;
+                    return userState;
                 }
-            } catch (e) {
-                console.log("Check profile failed", e);
-            }
-            return false;
+            } catch (e) { console.error("Profile load error", e); }
+            return null;
         }
 
-        // Register
-        window.performRegister = async () => {
-            const user = document.getElementById('reg-username').value.trim();
+        // 2. REGISTRATION LOGIC
+        window.toggleAuth = (mode) => {
+            document.getElementById('login-box').classList.toggle('hidden', mode === 'reg');
+            document.getElementById('reg-box').classList.toggle('hidden', mode === 'login');
+        };
+
+        document.getElementById('reg-btn').addEventListener('click', async () => {
+            const user = document.getElementById('reg-user').value.trim();
             const email = document.getElementById('reg-email').value.trim();
-            const pass = document.getElementById('reg-password').value;
+            const pass = document.getElementById('reg-pass').value;
             const conf = document.getElementById('reg-confirm').value;
-            const keepSigned = document.getElementById('reg-stay-signed-in').checked;
 
-            if(!user || !email || !pass) return showToast("ALL FIELDS REQUIRED!");
-            if(pass !== conf) return showToast("PASSWORDS MATCH ERROR");
+            if (!user || !email || !pass) return toast("FILL ALL FIELDS!");
+            if (pass !== conf) return toast("PASSWORDS DON'T MATCH!");
+            if (pass.length < 4) return toast("PASSWORD TOO SHORT!");
 
-            setLoading(true);
+            setLoading('reg', true);
 
             try {
-                await ensureSession(keepSigned ? browserLocalPersistence : browserSessionPersistence);
-                const uid = auth.currentUser.uid;
-
-                const nameRef = doc(db, 'artifacts', appId, 'public', 'data', 'usernames', user.toLowerCase());
+                // Check if username taken
+                const nameKey = user.toLowerCase();
+                const nameRef = doc(db, 'artifacts', appId, 'public', 'data', 'usernames', nameKey);
                 const nameSnap = await getDoc(nameRef);
-                if(nameSnap.exists()) {
-                    setLoading(false);
-                    return showToast("USERNAME TAKEN");
+
+                if (nameSnap.exists()) {
+                    setLoading('reg', false);
+                    return toast("USERNAME ALREADY TAKEN!");
                 }
+
+                // Auth and Save
+                await signInAnonymously(auth);
+                const uid = auth.currentUser.uid;
 
                 const profileData = {
                     username: user,
                     email: email,
                     password: pass,
                     balance: 100,
-                    usedCodes: []
+                    createdAt: Date.now()
                 };
-                
+
+                // CRITICAL: Set username map first, then profile
+                await setDoc(nameRef, { uid });
                 await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), profileData);
-                await setDoc(nameRef, { uid: uid });
 
-                showToast("REGISTERED! WELCOME");
-                revealSite();
+                toast("REGISTRATION SUCCESSFUL!");
+                setLoading('reg', false);
+                location.reload(); // Refresh to trigger state listener
             } catch (e) {
-                console.error(e);
-                setLoading(false);
-                showToast("REGISTRATION FAILED");
+                console.error("Reg Error:", e);
+                setLoading('reg', false);
+                toast("REGISTRATION FAILED: Check Console");
             }
-        };
+        });
 
-        // Login
-        window.performLogin = async () => {
-            const user = document.getElementById('login-username').value.trim();
-            const pass = document.getElementById('login-password').value;
-            const keepSigned = document.getElementById('stay-signed-in').checked;
+        // 3. LOGIN LOGIC
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const stay = document.getElementById('login-stay').checked;
 
-            if(!user || !pass) return showToast("ENTER CREDENTIALS");
+            if (!user || !pass) return toast("ENTER IDENTITY & KEY!");
 
-            setLoading(true);
+            setLoading('login', true);
 
             try {
-                // Determine persistence first
-                await ensureSession(keepSigned ? browserLocalPersistence : browserSessionPersistence);
-                
-                const nameRef = doc(db, 'artifacts', appId, 'public', 'data', 'usernames', user.toLowerCase());
-                const nameSnap = await getDoc(nameRef);
-                
-                if(!nameSnap.exists()) {
-                    setLoading(false);
-                    return showToast("USER NOT FOUND");
+                // Set persistence first
+                await setPersistence(auth, stay ? browserLocalPersistence : browserSessionPersistence);
+
+                const nameKey = user.toLowerCase();
+                const nameSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'usernames', nameKey));
+
+                if (!nameSnap.exists()) {
+                    setLoading('login', false);
+                    return toast("IDENTITY NOT FOUND!");
                 }
 
                 const targetUid = nameSnap.data().uid;
-                const profileRef = doc(db, 'artifacts', appId, 'users', targetUid, 'profile', 'data');
-                const profileSnap = await getDoc(profileRef);
+                const profileSnap = await getDoc(doc(db, 'artifacts', appId, 'users', targetUid, 'profile', 'data'));
 
-                if(profileSnap.exists() && profileSnap.data().password === pass) {
-                    userData = profileSnap.data();
-                    showToast("WELCOME BACK " + userData.username.toUpperCase());
-                    revealSite();
+                if (profileSnap.exists() && profileSnap.data().password === pass) {
+                    // Manual re-auth (simulated for anonymous bridge)
+                    // In a production app with Email/Pass, we would use signInWithEmailAndPassword
+                    // Here we are using a custom profile check on top of Anonymous ID
+                    await signInAnonymously(auth); 
+                    // Note: This is a simplified demo system. In a real system, you'd use Firebase Auth email providers.
+                    
+                    toast("WELCOME BACK, " + user.toUpperCase());
+                    location.reload();
                 } else {
-                    setLoading(false);
-                    showToast("INVALID PASSWORD");
+                    setLoading('login', false);
+                    toast("INVALID PASSWORD!");
                 }
             } catch (e) {
-                console.error(e);
-                setLoading(false);
-                showToast("LOGIN ERROR");
+                setLoading('login', false);
+                toast("LOGIN FAILED!");
             }
-        };
+        });
 
-        window.signOutUser = async () => {
+        // 4. UTILS
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = "toast show";
+            setTimeout(() => t.className = "toast", 3000);
+        }
+
+        function setLoading(type, active) {
+            const btn = document.getElementById(`${type}-btn`);
+            const text = document.getElementById(`${type}-text`);
+            const loader = document.getElementById(`${type}-loader`);
+            btn.disabled = active;
+            text.classList.toggle('hidden', active);
+            loader.classList.toggle('hidden', !active);
+        }
+
+        function showApp() {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+
+        function hideApp() {
+            document.getElementById('auth-overlay').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'none';
+        }
+
+        window.handleLogout = async () => {
             await signOut(auth);
             location.reload();
         };
 
-        // ------------------ SITE LOGIC ------------------
-
-        function updateBalanceDisplay() {
-            const display = document.getElementById('balance-display');
-            if(display) display.innerText = userData.balance;
-        }
-
-        window.handleRedeem = async () => {
-            const input = document.getElementById('redeem-input');
-            const code = input.value.trim().toUpperCase();
-            
-            if (code === "123") {
-                document.getElementById('director-reveal').style.display = 'block';
-                document.getElementById('director-reveal').scrollIntoView({ behavior: 'smooth' });
-                showToast("UNLOCKED???!!!");
-                input.value = "";
-                return;
-            }
-
-            const codes = { "NEW!": 20, "OFFICIALWEBSITE": 10 };
-
-            if (userData.usedCodes.includes(code)) {
-                showToast("CODE ALREADY USED!");
-            } else if (codes[code]) {
-                userData.balance += codes[code];
-                userData.usedCodes.push(code);
-                updateBalanceDisplay();
-                await saveProfile();
-                showToast(`+${codes[code]} DINO COINS REDEEMED!`);
-                input.value = "";
-            } else {
-                showToast("INVALID REDEEM CODE!");
-            }
-        };
-
-        window.handleQuests = () => {
-            showToast("COMING SOON...");
-        };
-
         window.buyItem = async (name, cost) => {
-            if (userData.balance >= cost) {
-                userData.balance -= cost;
-                updateBalanceDisplay();
-                await saveProfile();
-                
-                document.getElementById('modal-item-name').innerText = name;
-                document.getElementById('verification-code').innerText = generateVerificationCode();
-                document.getElementById('purchase-modal').style.display = 'flex';
+            if (userState.balance >= cost) {
+                userState.balance -= cost;
+                document.getElementById('balance-display').innerText = userState.balance;
+                await setDoc(doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'profile', 'data'), { balance: userState.balance }, { merge: true });
+                toast("PURCHASED: " + name);
             } else {
-                showToast("NOT ENOUGH DINO COINS!");
+                toast("NOT ENOUGH COINS!");
             }
         };
-
-        async function saveProfile() {
-            if(!auth.currentUser) return;
-            const uid = auth.currentUser.uid;
-            await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data'), userData, { merge: true });
-        }
-
-        function generateVerificationCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 10; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        window.showPixelStory = () => {
-            document.getElementById('pixel-story').style.display = 'block';
-            document.getElementById('pixel-story').scrollIntoView({behavior: 'smooth'});
-        };
-
-        window.closeModal = () => document.getElementById('purchase-modal').style.display = 'none';
-        
-        window.copyText = (text, label) => {
-            const tempInput = document.createElement("input");
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            showToast(`${label.toUpperCase()} COPIED`);
-        };
-
-        window.copyFullIP = () => {
-            const full = "DinoUniverse.aternos.me:61641";
-            const tempInput = document.createElement("input");
-            tempInput.value = full;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-            showToast("FULL ADDRESS COPIED");
-        };
-
-        window.showToast = (message) => {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.className = "toast show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
-        };
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('purchase-modal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        };
-
-        // Reveal body content structure (but keep hidden by auth overlay)
-        document.body.style.visibility = 'visible';
     </script>
 </body>
 </html>
