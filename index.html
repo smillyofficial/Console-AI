@@ -243,31 +243,17 @@
         import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, arrayUnion, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // GITHUB FRIENDLY FIX: Added safe parsing for environment variables
-        let firebaseConfig = {};
+        // GITHUB / EXTERNAL COMPATIBILITY FIX
+        let firebaseConfig = null;
         try {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
         } catch (e) {
-            console.error("Firebase config not found. If on GitHub, ensure you've injected config.");
+            console.warn("Firebase internal config not found.");
         }
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe-final';
-
-        let currentUser = null;
-        let authMode = 'login';
-        let isProcessing = false;
-
-        async function getDeviceID() {
-            const id = [navigator.userAgent, screen.width, screen.height, navigator.language].join("|");
-            const encoder = new TextEncoder();
-            const data = encoder.encode(id);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
+        // Initialize Shop Items immediately so they don't depend on Firebase to render
         const shopArsenal = [
             { name: "IRON SWORD & AXE", price: 50 },
             { name: "DIAMOND SWORD & AXE", price: 80 },
@@ -306,23 +292,46 @@
         renderItems(shopPickaxes, 'shop-pickaxes');
         renderItems(shopArmor, 'shop-armor');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const savedUser = sessionStorage.getItem('dino_user');
-                if (savedUser) loginUser(savedUser);
-            } else {
-                // GITHUB FRIENDLY FIX: Check if token exists before trying to use it
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (e) {
+        let db, auth, appId;
+
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe-final';
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const savedUser = sessionStorage.getItem('dino_user');
+                    if (savedUser) loginUser(savedUser);
+                } else {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        try {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } catch (e) {
+                            await signInAnonymously(auth);
+                        }
+                    } else {
                         await signInAnonymously(auth);
                     }
-                } else {
-                    await signInAnonymously(auth);
                 }
-            }
-        });
+            });
+        } else {
+            console.error("FIREBASE CONFIG MISSING: To use login/coins on GitHub, you must paste your Firebase config in the script tag.");
+            window.openAuthModal = () => alert("Login requires a Firebase setup. Check the console (F12) for instructions.");
+        }
+
+        let currentUser = null;
+        let authMode = 'login';
+        let isProcessing = false;
+
+        async function getDeviceID() {
+            const id = [navigator.userAgent, screen.width, screen.height, navigator.language].join("|");
+            const encoder = new TextEncoder();
+            const data = encoder.encode(id);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
         window.openAuthModal = () => document.getElementById('auth-modal').classList.add('active');
         window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
@@ -333,6 +342,7 @@
         };
 
         window.handleAuth = async () => {
+            if (!auth || !db) return alert("Firebase not connected.");
             if (isProcessing) return;
             const user = document.getElementById('auth-user').value.trim().toLowerCase();
             const pass = document.getElementById('auth-pass').value.trim();
@@ -385,7 +395,7 @@
         window.logout = () => { sessionStorage.clear(); location.reload(); };
 
         async function syncData() {
-            if (!currentUser) return;
+            if (!currentUser || !db) return;
             try {
                 const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser));
                 if (snap.exists()) document.getElementById('coin-count').innerText = snap.data().coins;
@@ -393,7 +403,7 @@
         }
 
         window.redeem = async () => {
-            if (isProcessing || !currentUser) return;
+            if (!db || isProcessing || !currentUser) return;
             const input = document.getElementById('code-input');
             const btn = document.getElementById('redeem-btn');
             const code = input.value.trim().toUpperCase();
@@ -416,7 +426,7 @@
 
         window.buy = async (name, price) => {
             if (!currentUser) return openAuthModal();
-            if (isProcessing) return;
+            if (!db || isProcessing) return;
             isProcessing = true;
             try {
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser);
