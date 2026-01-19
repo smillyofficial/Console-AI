@@ -238,20 +238,37 @@
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, increment, arrayUnion, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    <script>
+        // Custom Data Storage System (In-Memory + Local Persistence)
+        const StorageSystem = {
+            KEY: 'DINO_UNIVERSE_DATA',
+            
+            init() {
+                if (!localStorage.getItem(this.KEY)) {
+                    localStorage.setItem(this.KEY, JSON.stringify({ users: {} }));
+                }
+            },
 
-        // GITHUB / EXTERNAL COMPATIBILITY FIX
-        let firebaseConfig = null;
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(__firebase_config);
+            getData() {
+                return JSON.parse(localStorage.getItem(this.KEY));
+            },
+
+            saveData(data) {
+                localStorage.setItem(this.KEY, JSON.stringify(data));
+            },
+
+            getUser(username) {
+                return this.getData().users[username.toLowerCase()];
+            },
+
+            saveUser(username, userData) {
+                const data = this.getData();
+                data.users[username.toLowerCase()] = userData;
+                this.saveData(data);
             }
-        } catch (e) {
-            console.warn("Firebase internal config not found.");
-        }
+        };
+
+        StorageSystem.init();
 
         const shopArsenal = [
             { name: "IRON SWORD & AXE", price: 50 },
@@ -291,49 +308,19 @@
         renderItems(shopPickaxes, 'shop-pickaxes');
         renderItems(shopArmor, 'shop-armor');
 
-        let db, auth, appId;
-
-        if (firebaseConfig && firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'dino-universe-final';
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    const savedUser = sessionStorage.getItem('dino_user');
-                    if (savedUser) loginUser(savedUser);
-                } else {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        try {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } catch (e) {
-                            await signInAnonymously(auth);
-                        }
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                }
-            });
-        } else {
-            console.error("FIREBASE CONFIG MISSING");
-            window.openAuthModal = () => alert("Login requires a Firebase setup.");
-        }
-
         let currentUser = null;
         let authMode = 'login';
         let isProcessing = false;
 
-        async function getDeviceID() {
-            const id = [navigator.userAgent, screen.width, screen.height, navigator.language].join("|");
-            const encoder = new TextEncoder();
-            const data = encoder.encode(id);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+        // Auto-login if session exists
+        window.onload = () => {
+            const saved = sessionStorage.getItem('dino_user');
+            if (saved) loginUser(saved);
+        };
 
         window.openAuthModal = () => document.getElementById('auth-modal').classList.add('active');
         window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
+        
         window.toggleAuthMode = () => {
             authMode = authMode === 'login' ? 'register' : 'login';
             document.getElementById('auth-title').innerText = authMode.toUpperCase();
@@ -341,39 +328,42 @@
         };
 
         window.handleAuth = async () => {
-            if (!auth || !db) return alert("Firebase not connected.");
             if (isProcessing) return;
             const user = document.getElementById('auth-user').value.trim().toLowerCase();
             const pass = document.getElementById('auth-pass').value.trim();
             const errorEl = document.getElementById('auth-error');
             const btn = document.getElementById('auth-primary-btn');
 
-            if (!user || !pass) return (errorEl.innerText = "FILL FIELDS!", errorEl.classList.remove('hidden'));
+            if (!user || !pass) {
+                errorEl.innerText = "FILL FIELDS!";
+                errorEl.classList.remove('hidden');
+                return;
+            }
             
             isProcessing = true;
             btn.innerText = "WAIT...";
             
-            try {
-                const deviceID = await getDeviceID();
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user);
-                const snap = await getDoc(userRef);
+            setTimeout(() => { // Mimic network delay
+                try {
+                    const existingUser = StorageSystem.getUser(user);
 
-                if (authMode === 'register') {
-                    if (snap.exists()) throw new Error("NAME TAKEN!");
-                    await setDoc(userRef, { pass, coins: 0, redeemed: [], deviceID });
-                } else {
-                    if (!snap.exists() || snap.data().pass !== pass) throw new Error("WRONG LOGIN!");
+                    if (authMode === 'register') {
+                        if (existingUser) throw new Error("NAME TAKEN!");
+                        StorageSystem.saveUser(user, { pass, coins: 0, redeemed: [] });
+                    } else {
+                        if (!existingUser || existingUser.pass !== pass) throw new Error("WRONG LOGIN!");
+                    }
+                    
+                    loginUser(user);
+                    closeAuthModal();
+                } catch (e) {
+                    errorEl.innerText = e.message.toUpperCase();
+                    errorEl.classList.remove('hidden');
+                } finally {
+                    isProcessing = false;
+                    btn.innerText = "ENTER";
                 }
-                
-                loginUser(user);
-                closeAuthModal();
-            } catch (e) {
-                errorEl.innerText = e.message.toUpperCase();
-                errorEl.classList.remove('hidden');
-            } finally {
-                isProcessing = false;
-                btn.innerText = "ENTER";
-            }
+            }, 500);
         };
 
         function loginUser(username) {
@@ -388,62 +378,65 @@
 
         window.logout = () => { sessionStorage.clear(); location.reload(); };
 
-        async function syncData() {
-            if (!currentUser || !db) return;
-            try {
-                const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser));
-                if (snap.exists()) document.getElementById('coin-count').innerText = snap.data().coins;
-            } catch (e) { console.error("Sync failed:", e); }
+        function syncData() {
+            if (!currentUser) return;
+            const userData = StorageSystem.getUser(currentUser);
+            if (userData) {
+                document.getElementById('coin-count').innerText = userData.coins;
+            }
         }
 
-        window.redeem = async () => {
-            if (!db || isProcessing || !currentUser) return;
+        window.redeem = () => {
+            if (isProcessing || !currentUser) return;
             const input = document.getElementById('code-input');
             const btn = document.getElementById('redeem-btn');
             const code = input.value.trim().toUpperCase();
             
             const codes = { 
-                'RIPIX!': 20, 
-                'LORE!': 10, 
-                'WELCOME!': 50,
-                'GOTN!': 45,
-                'TNT_TOST': 100,
-                'PIXEL': 75,
-                'REQUIEM': 150,
-                'PRISM': 300,
-                'ENID': 200
+                'RIPIX!': 20, 'LORE!': 10, 'WELCOME!': 50, 'GOTN!': 45, 'TNT_TOST': 100,
+                'PIXEL': 75, 'REQUIEM': 150, 'PRISM': 300, 'ENID': 200
             };
             
             if (!codes.hasOwnProperty(code)) return alert("INVALID CODE!");
             
             isProcessing = true;
             btn.innerText = "CLAIMING...";
-            try {
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser);
-                await runTransaction(db, async (transaction) => {
-                    const snap = await transaction.get(userRef);
-                    if (snap.data().redeemed?.includes(code)) throw "ALREADY REDEEMED!";
-                    transaction.update(userRef, { redeemed: arrayUnion(code), coins: increment(codes[code]) });
-                });
-                input.value = "";
-                await syncData();
-            } catch (e) { alert(e); } finally { isProcessing = false; btn.innerText = "CLAIM LOOT"; }
+
+            setTimeout(() => {
+                const userData = StorageSystem.getUser(currentUser);
+                if (userData.redeemed.includes(code)) {
+                    alert("ALREADY REDEEMED!");
+                } else {
+                    userData.redeemed.push(code);
+                    userData.coins += codes[code];
+                    StorageSystem.saveUser(currentUser, userData);
+                    input.value = "";
+                    syncData();
+                }
+                isProcessing = false;
+                btn.innerText = "CLAIM LOOT";
+            }, 400);
         };
 
-        window.buy = async (name, price) => {
+        window.buy = (name, price) => {
             if (!currentUser) return openAuthModal();
-            if (!db || isProcessing) return;
+            if (isProcessing) return;
+            
+            const userData = StorageSystem.getUser(currentUser);
+            if (userData.coins < price) return alert("NOT ENOUGH COINS!");
+            
             isProcessing = true;
-            try {
-                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser);
-                const snap = await getDoc(userRef);
-                if (snap.data().coins < price) throw "NOT ENOUGH COINS!";
-                await updateDoc(userRef, { coins: increment(-price) });
+            setTimeout(() => {
+                userData.coins -= price;
+                StorageSystem.saveUser(currentUser, userData);
+                
                 document.getElementById('receipt-text').innerText = `Purchased ${name}!`;
                 document.getElementById('receipt-code').innerText = "DINO-" + Math.random().toString(36).substr(2, 9).toUpperCase();
                 document.getElementById('receipt-modal').classList.add('active');
+                
                 syncData();
-            } catch(e) { alert(e); } finally { isProcessing = false; }
+                isProcessing = false;
+            }, 300);
         };
 
         window.copyIP = () => {
@@ -455,8 +448,6 @@
             document.body.removeChild(el);
             alert("IP COPIED!");
         };
-
-        window.showLore = () => alert("TNT_TOST has seized the Nether. Chaos spreads.");
     </script>
 </body>
 </html>
